@@ -1,7 +1,6 @@
 package ifpe.br.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,37 +11,38 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ifpe.br.model.Cliente;
 
-import ifpe.br.repository.ClienteRepository;
+import ifpe.br.model.Cliente;
+import ifpe.br.service.ClienteService;
 
 @RestController
 @RequestMapping("cliente")
 public class ClienteController {
 
 	@Autowired
-	private ClienteRepository clienteRepository;
+	private ClienteService clienteService;
 	
 	@GetMapping
-	public List<Cliente> listaClientes(){
-		return clienteRepository.findAll();
+	public List<Cliente> retornaClientes(){
+		return clienteService.listaClientes();
 	}
 	
 	@GetMapping("/{id}")
 	public Cliente retornaClientePorId(@PathVariable Long id) {
-		Optional<Cliente> cliente = clienteRepository.findById(id);
-		if(cliente.isEmpty())
-			return null;
-		return cliente.get();
+		return clienteService.listaClientePorId(id);
 	}
 	
 	@PostMapping
 	public String createCliente(@RequestBody Cliente cliente) {
-		if(cliente.getEndereco() == null) {
-			return "Cliente deve possuir um endereço!";
+		if(cliente.getEndereco().getCep() == null) {
+			return "Cliente deve informar o Cep!";
+		}
+		else if(cliente.getEndereco().getNumero() == null) {
+			return "Cliente deve informar o número!";
 		}
 		else {
-		clienteRepository.save(cliente);
+		clienteService.buscaCep(cliente);
+		clienteService.salvarCliente(cliente);
 		}
 		return "Cliente criado!";
 	}
@@ -52,7 +52,7 @@ public class ClienteController {
 		if(cliente.getId() == null)
 			return "Informe o id!";
 			
-		clienteRepository.save(cliente);
+		clienteService.salvarCliente(cliente);
 		return "Cliente atualizado!";
 	}
 	
@@ -61,7 +61,7 @@ public class ClienteController {
 		if(cliente.getId() == null)
 			return "Informe o id!";
 		
-		clienteRepository.delete(cliente);
+		clienteService.deletarCliente(cliente);
 		return "Cliente deletado!";
 	}
 	
