@@ -13,7 +13,7 @@ import javax.persistence.OneToOne;
 
 @Entity
 public class Cliente {
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
